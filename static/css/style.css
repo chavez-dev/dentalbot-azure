@@ -1,158 +1,167 @@
-/* Estilos generales */
+/* General */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f8fb;
     margin: 0;
-    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f8;
     color: #333;
 }
 
+/* Header */
 header {
-    background-color: #2196f3;
+    background-color: #0077b6;
     color: white;
     text-align: center;
-    padding: 20px 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem 1rem;
 }
 
 main {
-    padding: 20px;
-    text-align: center;
+    padding: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-/* Ícono del chatbot */
+/* Botón flotante */
 #bot-icon {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #2196f3;
+    background-color: #0077b6;
     color: white;
-    font-size: 28px;
-    width: 60px;
-    height: 60px;
+    font-size: 1.6rem;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 0.7rem 0.8rem;
     cursor: pointer;
-    z-index: 999;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: background 0.3s;
 }
 
-/* Ventana del chatbot */
+#bot-icon:hover {
+    background-color: #0096c7;
+}
+
+/* Ventana de chat */
 #chat-window {
     position: fixed;
-    bottom: 90px;
+    bottom: 80px;
     right: 20px;
     width: 320px;
-    height: 450px;
-    background-color: white;
+    max-height: 500px;
+    background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     z-index: 1000;
 }
 
-/* Ocultar por defecto */
 .hidden {
     display: none;
 }
 
-/* Encabezado del chat */
+/* Cabecera del chat */
 .chat-header {
-    background-color: #2196f3;
+    background: #0077b6;
     color: white;
-    padding: 12px;
-    text-align: center;
+    padding: 0.8rem;
     font-weight: bold;
-    font-size: 16px;
+    text-align: center;
 }
 
-/* Caja de mensajes */
+/* Área del chat */
 .chat-box {
     flex: 1;
-    padding: 10px;
     overflow-y: auto;
-    background-color: #f1f1f1;
+    padding: 1rem;
+    background: #f9f9f9;
 }
 
 /* Mensajes */
 .msg {
-    margin: 8px 0;
+    margin-bottom: 1rem;
+    max-width: 85%;
 }
 
 .msg.user {
+    align-self: flex-end;
     text-align: right;
 }
 
 .msg.bot {
-    text-align: left;
+    align-self: flex-start;
 }
 
 .msg span {
     display: inline-block;
-    padding: 10px 14px;
-    border-radius: 20px;
-    max-width: 80%;
-    line-height: 1.4;
+    padding: 0.6rem 0.9rem;
+    border-radius: 18px;
+    background: #e0e0e0;
 }
 
 .msg.user span {
-    background-color: #d1edff;
-    color: #004975;
+    background: #0077b6;
+    color: white;
 }
 
-.msg.bot span {
-    background-color: #eeeeee;
-    color: #333;
-}
-
-/* Entrada de texto y botón */
+/* Entrada de texto */
 .chat-input {
     display: flex;
     border-top: 1px solid #ccc;
+    padding: 0.5rem;
+    background: #fff;
 }
 
 .chat-input input {
     flex: 1;
-    padding: 10px;
-    border: none;
-    outline: none;
-    font-size: 14px;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
 }
 
 .chat-input button {
-    background-color: #2196f3;
+    margin-left: 0.5rem;
+    padding: 0.6rem 1rem;
+    background-color: #0077b6;
     color: white;
     border: none;
-    padding: 10px 16px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
 }
 
-.chat-input button:hover {
-    background-color: #1976d2;
-}
-
-/* Tabla de horarios dentro del chat */
+/* Tabla en el chat */
 .tabla-chat {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
-    margin-top: 10px;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
 }
 
 .tabla-chat th,
 .tabla-chat td {
     border: 1px solid #ccc;
-    padding: 6px;
+    padding: 0.4rem;
     text-align: center;
-    background-color: white;
 }
 
-.tabla-chat th {
-    background-color: #e0f0ff;
-    font-weight: bold;
+/* RESPONSIVE */
+@media screen and (max-width: 600px) {
+    #chat-window {
+        width: 95%;
+        right: 2.5%;
+        bottom: 90px;
+        max-height: 80vh;
+    }
+
+    .chat-input input,
+    .chat-input button {
+        font-size: 0.9rem;
+    }
+
+    #bot-icon {
+        bottom: 16px;
+        right: 16px;
+        font-size: 1.4rem;
+    }
 }
