@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>DentalCare Tacna</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+
+<body>
+    <header>
+        <h1>Bienvenido a DentalCare Tacna 🦷</h1>
+        <p>Tu salud dental es nuestra prioridad.</p>
+    </header>
+
+    <!-- Contenido principal de la clínica -->
+    <main>
+        <p>Información sobre servicios, promociones, ubicación, etc.</p>
+    </main>
+
+    <!-- Ícono del bot (burbuja flotante) -->
+    <div id="bot-icon">💬</div>
+
+    <!-- Ventana de chat oculta al inicio -->
+    <div id="chat-window" class="hidden">
+        <div class="chat-header">DentalBot</div>
+        <div id="chat" class="chat-box"></div>
+        <div class="chat-input">
+            <input type="text" id="input" placeholder="Escribe tu mensaje..." />
+            <button onclick="enviar()">Enviar</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+
+</html>

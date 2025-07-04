@@ -1,1 +1,13 @@
+# Entornos virtuales
+venv/
 .env
+
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Archivos de log y base de datos temporales
+*.log
+*.sqlite3

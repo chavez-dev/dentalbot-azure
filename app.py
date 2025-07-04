@@ -1,39 +1,23 @@
+from flask import Flask, render_template
 from dotenv import load_dotenv
-import os
-from azure.ai.inference import ChatCompletionsClient
-from azure.ai.inference.models import SystemMessage, UserMessage
-from azure.core.credentials import AzureKeyCredential
+from bot.routes import bot_bp
 
-# Cargar variables del archivo .env
-load_dotenv()
+def create_app():
+    # Cargar variables del .env
+    load_dotenv()
 
-# Leer variables de entorno (sin claves en el código)
-endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT")
-model_name = os.getenv("DEPLOYMENT_NAME")
-key = os.getenv("AZURE_INFERENCE_SDK_KEY")
+    app = Flask(__name__, static_folder="static", template_folder="templates")
 
-# Inicializar cliente de Azure
-client = ChatCompletionsClient(endpoint=endpoint, credential=AzureKeyCredential(key))
+    # Registrar blueprint del bot
+    app.register_blueprint(bot_bp, url_prefix="/api")
 
-# Consulta al modelo
-response = client.complete(
-    messages=[
-        SystemMessage(content="""
-            Eres un asistente virtual profesional y cordial de la clínica dental **DentalCare Tacna**. Tu función es brindar información precisa y clara sobre la clínica.
+    # Ruta principal (página de la clínica)
+    @app.route("/")
+    def index():
+        return render_template("index.html")
 
-            **Información oficial:**
-            - Dirección: Av. Bolognesi 123, Tacna, Perú
-            - Teléfono: +51 952 123 456
-            - Correo: contacto@dentalcaretacna.pe
-            - Horarios: Lun-Vie 9am–6pm, Sáb 9am–1pm, Domingos cerrado
+    return app
 
-            Responde con amabilidad y profesionalismo.
-        """),
-        UserMessage(content="¿Cuál es el número de teléfono de la clínica?")
-    ],
-    model=model_name,
-    max_tokens=500
-)
-
-# Mostrar respuesta
-print(response.choices[0].message.content)
+if __name__ == "__main__":
+    app = create_app()
+    app.run(debug=True)
