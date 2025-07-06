@@ -36,8 +36,7 @@ async function enviar() {
         });
 
         const data = await res.json();
-        console.log(data.respuesta);
-        agregarMensaje("bot", data.respuesta);
+        agregarMensaje("bot", data.response);
     } catch (err) {
         console.error(err);
         agregarMensaje("bot", "⚠️ Ocurrió un error al conectar con el servidor.");
