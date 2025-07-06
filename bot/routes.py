@@ -1,5 +1,6 @@
+import asyncio
 from flask import Blueprint, request, jsonify
-from .controller import responder_azure
+from bot.controller import responder_azure
 
 bot_bp = Blueprint("bot", __name__)
 
@@ -7,5 +8,5 @@ bot_bp = Blueprint("bot", __name__)
 def chat():
     data = request.get_json()
     mensaje_usuario = data.get("prompt", "")
-    respuesta = responder_azure(mensaje_usuario)
+    respuesta = asyncio.run(responder_azure(mensaje_usuario))
     return jsonify({"response": respuesta})
