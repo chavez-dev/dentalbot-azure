@@ -9,7 +9,7 @@ class ResumenFinal(BaseModel):
 prompt = PromptTemplate(
     input_variables=["respuestas_json"],
     template="""
-Convierte esta lista de pares pregunta-respuesta en una sola respuesta clara en Markdown.
+Convierte esta lista de pares pregunta-respuesta en una sola respuesta clara en Markdown (que sea entendible).
 
 {respuestas_json}
 

@@ -13,8 +13,9 @@ function toggleChat() {
 function agregarMensaje(tipo, texto) {
     const chat = document.getElementById("chat");
     const msg = document.createElement("div");
+    const html = marked.parse(texto);
     msg.className = "msg " + tipo;
-    msg.innerHTML = `<span>${texto}</span>`;
+    msg.innerHTML = `<span>${html}</span>`;
     chat.appendChild(msg);
     chat.scrollTop = chat.scrollHeight;
 }
