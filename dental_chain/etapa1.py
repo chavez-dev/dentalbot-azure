@@ -19,6 +19,10 @@ Devuelve una lista JSON como esta:
   {{ "texto": "¿Cuál es el horario?" }},
   {{ "texto": "¿Puedo agendar una cita?" }}
 ]
+
+Si no hay preguntas devuelve una listo JSON vacía, como esta:
+[]
+
 """
 )
 

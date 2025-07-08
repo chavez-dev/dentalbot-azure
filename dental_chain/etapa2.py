@@ -22,6 +22,10 @@ Tu tarea es responder la siguiente pregunta de manera breve (máx. 3 frases) y *
 Pregunta:
 {pregunta}
 """
-).partial(format_instructions=parser.get_format_instructions())
+)
 
-respuesta_chain = prompt | llm | parser
+respuesta_chain = (
+    prompt.partial(format_instructions=parser.get_format_instructions())
+    | llm
+    | parser
+)
