@@ -1,5 +1,5 @@
 flask
 python-dotenv
-azure-core
-azure-ai-inference
-requests
+pydantic
+langchain-core
+langchain-openai
