@@ -13,3 +13,15 @@ SERVICIOS_LISTA = [
     "Blanqueamiento",
     "Extracción"
 ]
+
+GOOGLE_FORMS_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdOhSV_sV2aQMpf_ITg8VXxMmw6ENm5Xbi_cLF9EzfDVcsbRg/formResponse"
+
+FORM_FIELDS = {
+    "id": "entry.516806082",
+    "nombre": "entry.309627727",
+    "dni": "entry.1124227301",
+    "celular": "entry.105580532",
+    "servicio": "entry.2113367294",
+    "fecha_programada": "entry.1664945397",
+    "tracking": "entry.758801494"
+}

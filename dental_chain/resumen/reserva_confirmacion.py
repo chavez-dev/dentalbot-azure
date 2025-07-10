@@ -5,19 +5,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.runnables import RunnableLambda, RunnableMap
 from pydantic import BaseModel, Field
 from dental_chain.llm import llm
-
-GOOGLE_FORMS_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdOhSV_sV2aQMpf_ITg8VXxMmw6ENm5Xbi_cLF9EzfDVcsbRg/formResponse"
-
-FORM_FIELDS = {
-    "id": "entry.516806082",
-    "nombre": "entry.309627727",
-    "dni": "entry.1124227301",
-    "celular": "entry.105580532",
-    "servicio": "entry.2113367294",
-    "fecha_programada": "entry.1664945397",
-    "tracking": "entry.758801494"
-}
-
+from dental_chain.utils.constants import FORM_FIELDS, GOOGLE_FORMS_URL, SERVICIOS_LISTA
 
 class Reserva(BaseModel):
     nombre: str = Field(description="Nombre completo del paciente")
@@ -58,16 +46,37 @@ def enviar_a_google_forms(reserva_dict):
 
 
 def decision_logic(output):
-    if output["valido"]:
-        return enviar_a_google_forms(output["datos"])
-    else:
-        return mensaje_si_incompleto_chain.invoke(output["valido"])
+    datos = output["datos"]
+    valido_datos = output["valido_datos"]
+    valido_servicio = output["valido_servicio"]
+
+    if valido_datos["valido"] and valido_servicio:
+        return enviar_a_google_forms(datos)
+
+    if not valido_datos["valido"]:
+        faltantes = valido_datos["faltantes"]
+        mensaje = "⚠️ No puedo realizar una reserva porque faltan los siguientes datos: " + \
+            ", ".join(faltantes)
+        return mensaje
+
+    servicio = datos.get("servicio", "").strip()
+    return f"🚫 El servicio '{servicio}' no está disponible en DentalCare Tacna. Revisa la lista de servicios ofrecidos."
 
 
-def validar_datos(reserva: dict) -> bool:
-    campos = ["nombre", "dni", "celular",
-              "servicio", "fecha_programada", "tracking"]
-    return all(reserva.get(campo) for campo in campos)
+def validar_servicio(reserva: dict) -> bool:
+    servicio = reserva.get("servicio", "").strip().lower()
+    return servicio in [s.lower() for s in SERVICIOS_LISTA]
+
+
+def validar_datos(reserva: dict) -> dict:
+    campos_requeridos = ["nombre", "dni", "celular",
+                         "servicio", "fecha_programada", "tracking"]
+    campos_faltantes = [
+        campo for campo in campos_requeridos if not reserva.get(campo)]
+    return {
+        "valido": len(campos_faltantes) == 0,
+        "faltantes": campos_faltantes
+    }
 
 
 def mensaje_error_si_incompleto(valido: bool) -> str:
@@ -79,7 +88,7 @@ def mensaje_error_si_incompleto(valido: bool) -> str:
 parser = JsonOutputParser(pydantic_object=Reserva)
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de DentalCare Tacna. Un usuario ha proporcionado información para reservar una cita dental. 
-Extrae los siguientes datos en formato JSON estrictamente válido, si no hay datos devuelve un JSON vacio:
+Extrae los siguientes datos en formato JSON estrictamente válido:
 
 - nombre
 - dni
@@ -95,13 +104,14 @@ Mensaje:
 """)
 
 validar_datos_chain = RunnableLambda(validar_datos)
-mensaje_si_incompleto_chain = RunnableLambda(mensaje_error_si_incompleto)
+validar_servicio_chain = RunnableLambda(validar_servicio)
 
 extract_chain = prompt.partial(
     format_instructions=parser.get_format_instructions()) | llm | parser
 validacion_chain = RunnableMap({
     "datos": lambda r: r,
-    "valido": validar_datos_chain
+    "valido_datos": validar_datos_chain,
+    "valido_servicio": validar_servicio_chain
 })
 decision_chain = RunnableLambda(decision_logic)
 
