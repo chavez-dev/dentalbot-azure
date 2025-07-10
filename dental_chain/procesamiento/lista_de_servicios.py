@@ -1,11 +1,8 @@
-# langchain/etapa4.py
-
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
 from dental_chain.llm import llm
 
-# Lista conocida de servicios
 SERVICIOS_LISTA = [
     "Ortodoncia",
     "Limpieza dental",
@@ -13,16 +10,14 @@ SERVICIOS_LISTA = [
     "Extracción"
 ]
 
-# Modelo Pydantic
 class Servicio(BaseModel):
-    servicio: str = Field(..., description="Nombre del servicio mencionado")
-    descripcion: str = Field(..., description="Descripción breve del servicio")
-    tipo: str = Field(..., description="Clasificación general del servicio, por ejemplo: Preventivo, Estético, Correctivo, etc.")
-    frecuencia_recomendada: str = Field(..., description="Con qué frecuencia se recomienda realizar este servicio")
+    servicio: str = Field(description="Nombre del servicio mencionado")
+    descripcion: str = Field(description="Descripción breve del servicio")
+    tipo: str = Field(description="Clasificación general del servicio, por ejemplo: Preventivo, Estético, Correctivo, etc.")
+    frecuencia_recomendada: str = Field(description="Con qué frecuencia se recomienda realizar este servicio")
 
 parser = JsonOutputParser(pydantic_object=Servicio)
 
-# Prompt con contexto limitado
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de DentalCare Tacna. Los servicios disponibles son:
 

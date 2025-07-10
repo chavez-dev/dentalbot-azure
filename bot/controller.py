@@ -1,11 +1,11 @@
-from dental_chain.detectar_preguntas import tagging_chain
-from dental_chain.generar_respuestas_de_preguntas import respuesta_chain
-from dental_chain.convertir_a_markdown import markdown_chain
-from dental_chain.detectar_intencion import intencion_chain
-from dental_chain.chat_memoria import chat_chain  # ← memoria chatbot
+from dental_chain.procesamiento.detectar_preguntas import tagging_chain
+from dental_chain.respuestas.generar_respuestas_de_preguntas import respuesta_chain
+from dental_chain.resumen.convertir_a_markdown import markdown_chain
+from dental_chain.procesamiento.detectar_intencion import intencion_chain
+from dental_chain.conversation.chat_memoria import chat_chain  # ← memoria chatbot
 from langchain_core.messages import HumanMessage, AIMessage
 import json
-from dental_chain.reserva_confirmacion import reserva_chain
+from dental_chain.resumen.reserva_confirmacion import reserva_chain
 
 chat_conversation = []
 
