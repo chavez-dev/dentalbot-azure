@@ -1,11 +1,16 @@
 import requests
 import uuid
+import re
+from datetime import datetime, timedelta
+import pytz
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnableMap
 from pydantic import BaseModel, Field
 from dental_chain.llm import llm
 from dental_chain.utils.constants import FORM_FIELDS, GOOGLE_FORMS_URL, SERVICIOS_LISTA
+LIMA_TZ = pytz.timezone("America/Lima")
 
 
 class Reserva(BaseModel):
@@ -20,6 +25,7 @@ class Reserva(BaseModel):
 
 
 def enviar_a_google_forms(reserva_dict):
+    print(reserva_dict)
     reserva = Reserva(**reserva_dict)
     reserva_id = str(uuid.uuid4())
     payload = {
@@ -36,14 +42,42 @@ def enviar_a_google_forms(reserva_dict):
             GOOGLE_FORMS_URL,
             data=payload,
             headers={
-                "Content-Type": "application/x-www-form-urlencoded", "mode": "no-cors"}
+                "Content-Type": "application/x-www-form-urlencoded",
+                "mode": "no-cors"
+            }
         )
-        print("📤 Datos enviados a Google Forms")
-        print(f"🆔 ID generado: {reserva_id}")
-        return f"✅ Reserva registrada correctamente. Código: {reserva_id}"
+        confirmacion = confirmacion_chain.invoke(reserva.dict())
+        return f"{confirmacion} \n\n ✅ Reserva registrada correctamente. Código: {reserva_id}"
     except Exception as e:
         print("❌ Error al enviar a Google Forms:", e)
         return "❌ No se pudo registrar la reserva"
+
+
+def formatear_fecha(fecha_str: str) -> str:
+    try:
+        match = re.search(
+            r"(lunes|martes|miércoles|jueves|viernes|sábado|domingo)[^\d]*(\d{1,2}) ?(am|pm)", fecha_str.lower())
+        if match:
+            dia_semana, hora, meridiano = match.groups()
+            hora = int(hora)
+            if meridiano == "pm" and hora < 12:
+                hora += 12
+
+            hoy = datetime.now(LIMA_TZ)
+            dias_semana = ["lunes", "martes", "miércoles",
+                           "jueves", "viernes", "sábado", "domingo"]
+            objetivo_idx = dias_semana.index(dia_semana)
+
+            dias_hasta = (objetivo_idx - hoy.weekday() + 7) % 7 or 7
+            fecha_objetivo = hoy + timedelta(days=dias_hasta)
+            fecha_formateada = fecha_objetivo.replace(
+                hour=hora, minute=0, second=0, microsecond=0)
+
+            return fecha_formateada.strftime("%d-%m-%Y %H:%M")
+    except Exception as e:
+        print("❌ Error al formatear fecha:", e)
+
+    return fecha_str
 
 
 def decision_logic(output):
@@ -52,9 +86,10 @@ def decision_logic(output):
     valido_servicio = output["valido_servicio"]
 
     if valido_datos["valido"] and valido_servicio:
-        confirmacion = confirmacion_chain.invoke(datos)
-        resultado_envio = enviar_a_google_forms(datos)
-        return f"{confirmacion}\n\n{resultado_envio}"
+        fecha_normalizada = formatear_fecha_chain.invoke(
+            datos["fecha_programada"])
+        datos["fecha_programada"] = fecha_normalizada
+        return datos
 
     if not valido_datos["valido"]:
         faltantes = valido_datos["faltantes"]
@@ -89,6 +124,7 @@ def mensaje_error_si_incompleto(valido: bool) -> str:
 
 
 parser = JsonOutputParser(pydantic_object=Reserva)
+
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de DentalCare Tacna. Un usuario ha proporcionado información para reservar una cita dental. 
 Extrae los siguientes datos en formato JSON estrictamente válido:
@@ -120,17 +156,31 @@ Devuelve solo el siguiente texto:
 Gracias por confiar en nosotros 💙
 """)
 
-confirmacion_chain = confirmacion_prompt | llm | StrOutputParser()
+confirmacion_usuario_prompt = ChatPromptTemplate.from_template("""
+Analiza el siguiente mensaje y responde exclusivamente con "true" o "false".
 
+Mensaje del usuario:
+"{mensaje}"
+
+- Responde "true" si el usuario está confirmando o aceptando los datos.
+- Responde "false" si está cancelando, rechazando, tiene dudas o cambia de tema.
+
+Tu respuesta debe ser solo: true o false, sin explicaciones, ni símbolos, tal cual.
+""")
+
+
+confirmacion_usuario_chain = confirmacion_usuario_prompt | llm | StrOutputParser()
+confirmacion_chain = confirmacion_prompt | llm | StrOutputParser()
 validar_datos_chain = RunnableLambda(validar_datos)
 validar_servicio_chain = RunnableLambda(validar_servicio)
+formatear_fecha_chain = RunnableLambda(formatear_fecha)
 
 extract_chain = prompt.partial(
     format_instructions=parser.get_format_instructions()) | llm | parser
 validacion_chain = RunnableMap({
     "datos": lambda r: r,
     "valido_datos": validar_datos_chain,
-    "valido_servicio": validar_servicio_chain
+    "valido_servicio": validar_servicio_chain,
 })
 decision_chain = RunnableLambda(decision_logic)
 

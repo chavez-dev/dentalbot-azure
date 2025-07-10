@@ -4,3 +4,4 @@ pydantic == 2.11.7
 langchain-core == 0.3.68
 langchain-openai == 0.3.27
 gunicorn == 23.0.0
+pytz == 2025.2
