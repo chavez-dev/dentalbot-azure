@@ -5,12 +5,23 @@ from dental_chain.etapa0 import simple_chain
 from dental_chain.etapa5 import chat_chain  # ← memoria chatbot
 from langchain_core.messages import HumanMessage, AIMessage
 import json
+from dental_chain.etapa6_reserva import reserva_chain
 
 # 🧠 Historial de conversación en memoria (por sesión)
 chat_conversation = []
 
 async def responder_azure(mensaje: str) -> str:
     try:
+        ##############################
+        # Hola, quiero una cita para ortodoncia el viernes a las 10:30 a.m. Mi nombre es Carla López, mi DNI es 72398412, celular 955431298. Ya pagué con Yape, el código es 8472XYC.
+
+        if any(x in mensaje.lower() for x in ["reservar", "cita", "agenda", "yape", "atención el", "confirmar cita"]):
+            print("📌 Posible mensaje de reserva detectado:")
+            resultado = reserva_chain.invoke({"mensaje": mensaje})
+            print("📝 Resultado reserva_chain:")
+            print(resultado)
+            return resultado
+        #########################33
         # Etapa 1: detectar preguntas
         preguntas = tagging_chain.invoke({"mensaje": mensaje})
         print("🔹 Preguntas detectadas:")
