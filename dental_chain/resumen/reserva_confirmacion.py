@@ -13,10 +13,8 @@ from dental_chain.llm import llm
 # Zona horaria de Lima
 LIMA_TZ = pytz.timezone("America/Lima")
 
-# URL del formulario de Google
 GOOGLE_FORMS_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdOhSV_sV2aQMpf_ITg8VXxMmw6ENm5Xbi_cLF9EzfDVcsbRg/formResponse"
 
-# Campos del formulario
 FORM_FIELDS = {
     "id": "entry.516806082",
     "nombre": "entry.309627727",
@@ -27,7 +25,6 @@ FORM_FIELDS = {
     "tracking": "entry.758801494"
 }
 
-# Modelo de datos
 class Reserva(BaseModel):
     nombre: str = Field(description="Nombre completo del paciente")
     dni: str = Field(description="Número de DNI del paciente")
@@ -36,7 +33,6 @@ class Reserva(BaseModel):
     fecha_programada: str = Field(description="Fecha y hora de la cita solicitada")
     tracking: str = Field(description="Código de verificación o seguimiento de Yape")
 
-# Función para enviar datos a Google Forms
 def enviar_a_google_forms(reserva_dict):
     reserva = Reserva(**reserva_dict)
     reserva_id = str(uuid.uuid4())
@@ -65,7 +61,6 @@ def enviar_a_google_forms(reserva_dict):
         print("❌ Error al enviar a Google Forms:", e)
         return "❌ No se pudo registrar la reserva"
 
-# Formatear fecha en lenguaje natural a YYYY-MM-DD HH:MM
 def formatear_fecha(fecha_str: str) -> str:
     try:
         match = re.search(r"(lunes|martes|miércoles|jueves|viernes|sábado|domingo)[^\d]*(\d{1,2}) ?(am|pm)", fecha_str.lower())
@@ -89,30 +84,16 @@ def formatear_fecha(fecha_str: str) -> str:
 
     return fecha_str
 
-# Validación de datos
 def validar_datos(reserva: dict) -> bool:
     campos = ["nombre", "dni", "celular", "servicio", "fecha_programada", "tracking"]
     if not all(reserva.get(c) for c in campos):
         return False
-    if "202" not in reserva["fecha_programada"]:  # Requiere formato YYYY-MM-DD
+    if "202" not in reserva["fecha_programada"]:
         return False
     return True
 
-# Mensaje de error si los datos están incompletos
-def mensaje_error_si_incompleto(valido: bool) -> str:
-    if valido:
-        return "✅ Datos completos. Procediendo con la reserva..."
-    return "⚠️ Faltan datos importantes. Asegúrate de proporcionar nombre, DNI, celular, servicio, fecha y código de Yape."
-
-# Decisión final según la validación
-def decision_logic(output):
-    if output["valido"]:
-        return enviar_a_google_forms(output["datos"])
-    else:
-        return mensaje_si_incompleto_chain.invoke(output["valido"])
-
-# Prompt para extraer los datos de la reserva
 parser = JsonOutputParser(pydantic_object=Reserva)
+
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de DentalCare Tacna. Un usuario ha proporcionado información para reservar una cita dental. 
 Extrae los siguientes datos en formato JSON estrictamente válido, si no hay datos devuelve un JSON vacío:
@@ -130,12 +111,9 @@ Mensaje:
 {mensaje}
 """)
 
-# Runnables
 extract_chain = prompt.partial(
     format_instructions=parser.get_format_instructions()
 ) | llm | parser
-
-to_dict_chain = RunnableLambda(lambda r: r.dict())
 
 formatear_fecha_chain = RunnableLambda(
     lambda reserva: {
@@ -144,20 +122,8 @@ formatear_fecha_chain = RunnableLambda(
     }
 )
 
-validar_datos_chain = RunnableLambda(validar_datos)
-mensaje_si_incompleto_chain = RunnableLambda(mensaje_error_si_incompleto)
-
-validacion_chain = RunnableMap({
-    "datos": lambda r: r,
-    "valido": validar_datos_chain
-})
-
-decision_chain = RunnableLambda(decision_logic)
-
-# Cadena final que puedes invocar en el controller
+# Esta cadena solo devuelve los datos formateados
 reserva_chain = (
     extract_chain
     | formatear_fecha_chain
-    | validacion_chain
-    | decision_chain
 )
