@@ -2,7 +2,7 @@ from dental_chain.procesamiento.detectar_preguntas import tagging_chain
 from dental_chain.respuestas.generar_respuestas_de_preguntas import respuesta_chain
 from dental_chain.resumen.convertir_a_markdown import markdown_chain
 from dental_chain.procesamiento.detectar_intencion import intencion_chain
-from dental_chain.conversacion.chat_memoria import chat_chain  # ← memoria chatbot
+from dental_chain.conversacion.chat_memoria import chat_chain
 from langchain_core.messages import HumanMessage, AIMessage
 import json
 from dental_chain.resumen.reserva_confirmacion import reserva_chain
@@ -15,6 +15,10 @@ async def responder_azure(mensaje: str) -> str:
         print(f"🧭 Intención detectada: {intencion}")
 
         if intencion == "reserva":
+            # comprobar si los datos son suficientes para reservar una cita
+            # if true que haga la reserva
+            # mencionar que informacion falta para la reserva de cita
+            
             resultado = reserva_chain.invoke({"mensaje": mensaje})
             return resultado
 
@@ -42,7 +46,6 @@ async def responder_azure(mensaje: str) -> str:
             return resumen["respuesta"]
 
         elif intencion == "chat":
-            # 🔁 Si no hay preguntas, usa memoria tipo chatbot
             chat_conversation.append(HumanMessage(content=mensaje))
             respuesta = chat_chain.invoke({"chat_conversation": chat_conversation})
             chat_conversation.append(AIMessage(content=respuesta))

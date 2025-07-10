@@ -2,13 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
 from dental_chain.llm import llm
-
-SERVICIOS_LISTA = [
-    "Ortodoncia",
-    "Limpieza dental",
-    "Blanqueamiento",
-    "Extracción"
-]
+from dental_chain.utils.constants import SERVICIOS_LISTA
 
 class Servicio(BaseModel):
     servicio: str = Field(description="Nombre del servicio mencionado")
