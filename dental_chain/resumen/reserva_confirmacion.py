@@ -1,11 +1,12 @@
 import requests
 import uuid
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnableMap
 from pydantic import BaseModel, Field
 from dental_chain.llm import llm
 from dental_chain.utils.constants import FORM_FIELDS, GOOGLE_FORMS_URL, SERVICIOS_LISTA
+
 
 class Reserva(BaseModel):
     nombre: str = Field(description="Nombre completo del paciente")
@@ -26,7 +27,7 @@ def enviar_a_google_forms(reserva_dict):
         FORM_FIELDS["nombre"]: reserva.nombre,
         FORM_FIELDS["dni"]: reserva.dni,
         FORM_FIELDS["celular"]: reserva.celular,
-        FORM_FIELDS["servicio"]: reserva.servicio,
+        FORM_FIELDS["servicio"]: reserva.servicio.upper(),
         FORM_FIELDS["fecha_programada"]: reserva.fecha_programada,
         FORM_FIELDS["tracking"]: reserva.tracking,
     }
@@ -51,7 +52,9 @@ def decision_logic(output):
     valido_servicio = output["valido_servicio"]
 
     if valido_datos["valido"] and valido_servicio:
-        return enviar_a_google_forms(datos)
+        confirmacion = confirmacion_chain.invoke(datos)
+        resultado_envio = enviar_a_google_forms(datos)
+        return f"{confirmacion}\n\n{resultado_envio}"
 
     if not valido_datos["valido"]:
         faltantes = valido_datos["faltantes"]
@@ -102,6 +105,22 @@ Extrae los siguientes datos en formato JSON estrictamente válido:
 Mensaje:
 {mensaje}
 """)
+
+confirmacion_prompt = ChatPromptTemplate.from_template("""
+Devuelve solo el siguiente texto:
+📅 ¡Reserva Confirmada!
+
+🙋‍♂️ Paciente: {nombre}  
+🦷 Servicio: {servicio}  
+🗓️ Fecha programada: {fecha_programada}
+
+📍 Te esperamos en DentalCare Tacna.
+🕒 Por favor llega 10 minutos antes de tu cita.
+
+Gracias por confiar en nosotros 💙
+""")
+
+confirmacion_chain = confirmacion_prompt | llm | StrOutputParser()
 
 validar_datos_chain = RunnableLambda(validar_datos)
 validar_servicio_chain = RunnableLambda(validar_servicio)
