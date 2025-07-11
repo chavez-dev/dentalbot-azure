@@ -127,7 +127,7 @@ parser = JsonOutputParser(pydantic_object=Reserva)
 
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de DentalCare Tacna. Un usuario ha proporcionado información para reservar una cita dental. 
-Extrae los siguientes datos en formato JSON estrictamente válido:
+Extrae los siguientes datos en formato JSON estrictamente válido, si no hay ningun dato, devuelve vacío en formato JSON:
 
 - nombre
 - dni
