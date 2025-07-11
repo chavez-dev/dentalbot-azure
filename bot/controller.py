@@ -1,5 +1,5 @@
 from dental_chain.procesamiento.detectar_preguntas import tagging_chain
-from dental_chain.respuestas.generar_respuestas_de_preguntas import respuesta_chain
+from dental_chain.respuestas.generar_respuestas_de_preguntas import procesar_preguntas_chain
 from dental_chain.resumen.convertir_a_markdown import markdown_chain
 from dental_chain.procesamiento.detectar_intencion import intencion_chain
 from dental_chain.conversacion.chat_memoria import chat_chain
@@ -54,8 +54,7 @@ async def responder_azure(mensaje: str) -> str:
             preguntas = tagging_chain.invoke({"mensaje": mensaje})
             print("🔹 Preguntas detectadas:")
             print(json.dumps(preguntas, indent=2, ensure_ascii=False))
-            respuestas = [respuesta_chain.invoke(
-                {"pregunta": p["texto"]}) for p in preguntas]
+            respuestas = procesar_preguntas_chain.invoke(preguntas)
             print("🔹 Respuestas generadas:")
             print(json.dumps(respuestas, indent=2, ensure_ascii=False))
 

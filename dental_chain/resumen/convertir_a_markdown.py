@@ -9,20 +9,20 @@ class ResumenFinal(BaseModel):
 prompt = PromptTemplate(
     input_variables=["respuestas_json"],
     template="""
-Dada la siguiente lista de pares pregunta-respuesta en formato JSON:
-Recuerda lo que el usuario ha dicho antes y da continuidad a la conversación.
+Toma la siguiente lista de pares pregunta-respuesta en formato JSON:
 
 {respuestas_json}
 
-Genera una respuesta única, clara y coherente basada en toda la información. Devuelve dos versiones:
+No inventes ni agregues información adicional.
 
-1. Una respuesta en **formato Markdown**, con títulos, listas u otros elementos si es necesario.
-2. La misma respuesta pero en texto plano (sin ningún formato Markdown).
+Devuelve dos versiones:
+1. "respuesta": Las mismas respuestas con formato Markdown.
+2. "respuesta2": Las mismas respuestas en texto plano (sin formato).
 
-Devuelve el resultado como un JSON con la siguiente estructura:
+Formato de salida:
 {{ 
-  "respuesta": "respuesta en formato markdown aquí", 
-  "respuesta2": "misma respuesta en texto plano aquí" 
+  "respuesta": "contenido en Markdown", 
+  "respuesta2": "contenido en texto plano" 
 }}
 """
 )
