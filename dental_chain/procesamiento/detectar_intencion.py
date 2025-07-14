@@ -1,19 +1,31 @@
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, FewShotChatMessagePromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from dental_chain.llm import llm
 
-intencion_prompt = ChatPromptTemplate.from_template("""
-Eres un sistema que clasifica la intención de un mensaje enviado por un usuario en una clínica dental.
+ejemplos = [
+    {"mensaje": "Hola, quiero agendar una cita para ortodoncia el martes",
+        "intencion": "reserva"},
+    {"mensaje": "¿Qué horarios tienen disponibles?", "intencion": "pregunta"},
+    {"mensaje": "Muchas gracias por la atención", "intencion": "chat"},
+]
 
-Las posibles intenciones son:
-- "reserva": si el mensaje contiene datos o intención clara de reservar cita (nombre, fecha, yape, etc.)
-- "pregunta": si el mensaje contiene preguntas informativas sobre servicios, horarios, precios, etc.
-- "chat": si el mensaje es simplemente saludo, agradecimiento, o conversación sin objetivo claro.
+example_prompt = ChatPromptTemplate.from_messages([
+    ("human", "{mensaje}"),
+    ("ai", "{intencion}")
+])
 
-Solo responde con una palabra: reserva, pregunta o chat.
+few_shot_prompt = FewShotChatMessagePromptTemplate(
+    examples=ejemplos,
+    example_prompt=example_prompt,
+)
 
-Mensaje:
-{mensaje}
-""")
+intencion_prompt = ChatPromptTemplate.from_messages([
+    few_shot_prompt,
+    ("system",
+     "Eres un sistema que clasifica la intención de un mensaje en DentalCare Tacna. "
+     "Las posibles intenciones son: reserva, pregunta, chat. "
+     "RESPONDE SOLO con una palabra: reserva, pregunta o chat."),
+    ("human", "{mensaje}")
+])
 
 intencion_chain = intencion_prompt | llm | StrOutputParser()
