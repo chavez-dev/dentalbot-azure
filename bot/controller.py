@@ -16,7 +16,7 @@ async def responder_azure(mensaje: str) -> str:
 
     try:
         if pending_reserva:
-            respuesta = confirmacion_usuario_chain.invokFe(
+            respuesta = confirmacion_usuario_chain.invoke(
                 {"mensaje": mensaje}).strip().lower()
             print(respuesta)
             if respuesta == "true":
@@ -32,6 +32,13 @@ async def responder_azure(mensaje: str) -> str:
 
         if intencion == "reserva":
             resultado = reserva_chain.invoke({"mensaje": mensaje})
+            print(resultado)
+            if isinstance(resultado, str):
+                try:
+                    resultado = json.loads(resultado)
+                except json.JSONDecodeError:
+                    return resultado
+
             if isinstance(resultado, dict):
                 pending_reserva = resultado
                 resumen = (
@@ -46,8 +53,7 @@ async def responder_azure(mensaje: str) -> str:
                 )
                 return resumen
 
-            else:
-                return resultado
+            return resultado
 
         # Si es una pregunta
         elif intencion == "pregunta":

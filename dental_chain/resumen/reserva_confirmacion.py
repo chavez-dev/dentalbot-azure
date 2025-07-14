@@ -80,25 +80,25 @@ def formatear_fecha(fecha_str: str) -> str:
     return fecha_str
 
 
-def decision_logic(output):
-    datos = output["datos"]
-    valido_datos = output["valido_datos"]
-    valido_servicio = output["valido_servicio"]
+# def decision_logic(output):
+#     datos = output["datos"]
+#     valido_datos = output["valido_datos"]
+#     valido_servicio = output["valido_servicio"]
 
-    if valido_datos["valido"] and valido_servicio:
-        fecha_normalizada = formatear_fecha_chain.invoke(
-            datos["fecha_programada"])
-        datos["fecha_programada"] = fecha_normalizada
-        return datos
+#     if valido_datos["valido"] and valido_servicio:
+#         fecha_normalizada = formatear_fecha_chain.invoke(
+#             datos["fecha_programada"])
+#         datos["fecha_programada"] = fecha_normalizada
+#         return datos
 
-    if not valido_datos["valido"]:
-        faltantes = valido_datos["faltantes"]
-        mensaje = "⚠️ No puedo realizar una reserva porque faltan los siguientes datos: " + \
-            ", ".join(faltantes)
-        return mensaje
+#     if not valido_datos["valido"]:
+#         faltantes = valido_datos["faltantes"]
+#         mensaje = "⚠️ No puedo realizar una reserva porque faltan los siguientes datos: " + \
+#             ", ".join(faltantes)
+#         return mensaje
 
-    servicio = datos.get("servicio", "").strip()
-    return f"🚫 El servicio '{servicio}' no está disponible en DentalCare Tacna. Revisa la lista de servicios ofrecidos."
+#     servicio = datos.get("servicio", "").strip()
+#     return f"🚫 El servicio '{servicio}' no está disponible en DentalCare Tacna. Revisa la lista de servicios ofrecidos."
 
 
 def validar_servicio(reserva: dict) -> bool:
@@ -168,6 +168,40 @@ Mensaje del usuario:
 Tu respuesta debe ser solo: true o false, sin explicaciones, ni símbolos, tal cual.
 """)
 
+decision_prompt = ChatPromptTemplate.from_template("""
+Actúa como un asistente de DentalCare Tacna. Has recibido los siguientes elementos:
+
+- Datos extraídos del usuario:
+{datos}
+
+- Resultado de validación de datos:
+{valido_datos}
+
+- Validación del servicio:
+{valido_servicio}
+
+Sigue estas instrucciones cuidadosamente:
+
+1. Si faltan datos requeridos, responde con un mensaje que comience con ⚠️, indicando los campos que faltan.
+2. Si el servicio no es válido, responde con un mensaje que comience con 🚫, indicando que no está en la lista.
+3. Si todo es válido, responde con un JSON puro (sin etiquetas, sin formato Markdown, sin comillas triples ni código bloque). El formato exacto debe ser:
+
+REGLAS IMPORTANTES:
+- No incluyas explicaciones ni texto adicional.
+- No uses formato Markdown como ```json o etiquetas similares.
+- Solo responde con el JSON si todo es correcto, o el mensaje de error si hay problemas.
+
+{{
+  "nombre": "...",
+  "dni": "...",
+  "celular": "...",
+  "servicio": "...",
+  "fecha_programada": "...",
+  "tracking": "..."
+}}
+
+""")
+
 
 confirmacion_usuario_chain = confirmacion_usuario_prompt | llm | StrOutputParser()
 confirmacion_chain = confirmacion_prompt | llm | StrOutputParser()
@@ -175,6 +209,7 @@ validar_datos_chain = RunnableLambda(validar_datos)
 validar_servicio_chain = RunnableLambda(validar_servicio)
 formatear_fecha_chain = RunnableLambda(formatear_fecha)
 
+decision_chain = decision_prompt | llm | StrOutputParser()
 extract_chain = prompt.partial(
     format_instructions=parser.get_format_instructions()) | llm | parser
 validacion_chain = RunnableMap({
@@ -182,6 +217,18 @@ validacion_chain = RunnableMap({
     "valido_datos": validar_datos_chain,
     "valido_servicio": validar_servicio_chain,
 })
-decision_chain = RunnableLambda(decision_logic)
+# decision_chain = RunnableLambda(decision_logic)
 
-reserva_chain = extract_chain | validacion_chain | decision_chain
+normalizar_fecha_chain = RunnableLambda(
+    lambda d: {
+        **d,
+        "datos": {
+            **d["datos"],
+            "fecha_programada": formatear_fecha_chain.invoke(d["datos"]["fecha_programada"])
+            if d["datos"].get("fecha_programada") else ""
+        }
+    }
+)
+
+
+reserva_chain = extract_chain | validacion_chain | normalizar_fecha_chain | decision_chain
