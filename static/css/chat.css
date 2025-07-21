@@ -1,0 +1,145 @@
+/* Botón flotante */
+#bot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #0077b6;
+    color: white;
+    font-size: 1.6rem;
+    border-radius: 50%;
+    padding: 0.7rem 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: background 0.3s;
+}
+
+#bot-icon:hover {
+    background-color: #0096c7;
+}
+
+/* Ventana de chat */
+#chat-window {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 320px;
+    max-height: 500px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Cabecera del chat */
+.chat-header {
+    background: #0077b6;
+    color: white;
+    padding: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Área del chat */
+.chat-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: #f9f9f9;
+}
+
+/* Mensajes */
+.msg {
+    margin-bottom: 1rem;
+    max-width: 85%;
+}
+
+.msg.user {
+    align-self: flex-end;
+    text-align: right;
+}
+
+.msg.bot {
+    align-self: flex-start;
+}
+
+.msg span {
+    display: inline-block;
+    padding: 0.6rem 0.9rem;
+    border-radius: 18px;
+    background: #e0e0e0;
+}
+
+.msg.user span {
+    background: #0077b6;
+    color: white;
+}
+
+/* Entrada de texto */
+.chat-input {
+    display: flex;
+    border-top: 1px solid #ccc;
+    padding: 0.5rem;
+    background: #fff;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.chat-input button {
+    margin-left: 0.5rem;
+    padding: 0.6rem 1rem;
+    background-color: #0077b6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Tabla en el chat */
+.tabla-chat {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.tabla-chat th,
+.tabla-chat td {
+    border: 1px solid #ccc;
+    padding: 0.4rem;
+    text-align: center;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 600px) {
+    #chat-window {
+        width: 95%;
+        right: 2.5%;
+        bottom: 90px;
+        max-height: 80vh;
+    }
+
+    .chat-input input,
+    .chat-input button {
+        font-size: 0.9rem;
+    }
+
+    #bot-icon {
+        bottom: 16px;
+        right: 16px;
+        font-size: 1.4rem;
+    }
+}

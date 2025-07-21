@@ -5,7 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DentalCare Tacna</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    <!-- Estilos de la página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pagina.css') }}" />
+
+    <!-- Estilos del chatbot -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}" />
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
@@ -15,15 +21,87 @@
         <p>Tu salud dental es nuestra prioridad.</p>
     </header>
 
-    <!-- Contenido principal de la clínica -->
+    <nav>
+        <ul>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#promociones">Promociones</a></li>
+            <li><a href="#ubicacion">Ubicación</a></li>
+            <li><a href="#contacto">Contáctanos</a></li>
+        </ul>
+    </nav>
+
     <main>
-        <p>Información sobre servicios, promociones, ubicación, etc.</p>
+        <section id="servicios">
+            <h2>Servicios Dentales</h2>
+            <div class="tarjetas-servicios">
+
+                <div class="tarjeta-servicio">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDwrOh-sXfvIdM5hPP1AwW9KP8dkvny4yglA&s"
+                        alt="Ortodoncia">
+                    <h3>Ortodoncia</h3>
+                </div>
+
+                <div class="tarjeta-servicio">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnte_GB43wqLgXpstdaGkHMKyNqcWdHIZUyQ&s"
+                        alt="Limpieza dental">
+                    <h3>Limpieza dental</h3>
+                </div>
+
+                <div class="tarjeta-servicio">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnl98nP3NrlgrqOyHuzJ7okEShEEcdRo6k-g&s"
+                        alt="Blanqueamiento">
+                    <h3>Blanqueamiento</h3>
+                </div>
+
+                <div class="tarjeta-servicio">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwlwqQ7OyYvpSSKX__qEEdagEN4bAHeDKJfQ&s"
+                        alt="Extracción">
+                    <h3>Extracción</h3>
+                </div>
+
+            </div>
+        </section>
+
+
+        <section id="promociones">
+            <h2>Promociones Especiales</h2>
+            <img src="https://plus.unsplash.com/premium_photo-1661775868038-77ae66913504?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZGVudGFsJTIwY2FyZXxlbnwwfHwwfHx8MA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000"
+                alt="Promociones Dentales" class="img-section">
+            <p>¡Aprovecha nuestro paquete de limpieza y blanqueamiento al <strong>20% de descuento</strong> durante este
+                mes!</p>
+        </section>
+
+        <section id="ubicacion">
+            <h2>¿Dónde estamos ubicados?</h2>
+            <p>📍 Av. San Martín 1234, Tacna - Perú</p>
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3344.1668000891425!2d-70.24791278901317!3d-18.01430078172163!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9159225c2a46d4fd%3A0x2edb8d70b6014e0d!2sAv.%20San%20Mart%C3%ADn%201234%2C%20Tacna%2023001!5e0!3m2!1ses!2spe!4v1695671234567"
+                width="100%" height="250" allowfullscreen loading="lazy"></iframe>
+        </section>
+
+        <section id="contacto">
+            <h2>Contáctanos</h2>
+            <img src="https://plus.unsplash.com/premium_photo-1681966962522-546f370bc98e?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZGVudGlzdHxlbnwwfHwwfHx8MA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000"
+                alt="Contacto Clínica" class="img-section">
+            <form>
+                <label for="nombre">Nombre:</label><br>
+                <input type="text" id="nombre" name="nombre"><br>
+
+                <label for="correo">Correo:</label><br>
+                <input type="email" id="correo" name="correo"><br>
+
+                <label for="mensaje">Mensaje:</label><br>
+                <textarea id="mensaje" name="mensaje"></textarea><br>
+
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
     </main>
 
-    <!-- Ícono del bot (burbuja flotante) -->
+    <!-- Ícono del bot -->
     <div id="bot-icon">💬</div>
 
-    <!-- Ventana de chat oculta al inicio -->
+    <!-- Ventana de chat -->
     <div id="chat-window" class="hidden">
         <div class="chat-header">DentalBot</div>
         <div id="chat" class="chat-box"></div>
