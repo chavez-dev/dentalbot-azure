@@ -120,7 +120,7 @@ def validar_datos(reserva: dict) -> dict:
 def mensaje_error_si_incompleto(valido: bool) -> str:
     if valido:
         return "✅ Datos completos. Procediendo con la reserva..."
-    return "⚠️ Faltan datos importantes. Asegúrate de proporcionar nombre, DNI, teléfono, servicio, fecha y código de Yape."
+    return "Asegúrate de proporcionar nombre, DNI, teléfono, servicio, fecha y código de Yape."
 
 
 parser = JsonOutputParser(pydantic_object=Reserva)
@@ -182,8 +182,8 @@ Actúa como un asistente de DentalCare Tacna. Has recibido los siguientes elemen
 
 Sigue estas instrucciones cuidadosamente:
 
-1. Si faltan datos requeridos, responde con un mensaje que comience con ⚠️, indicando los campos que faltan.
-2. Si el servicio no es válido, responde con un mensaje que comience con 🚫, indicando que no está en la lista.
+1. Si faltan datos requeridos, responde con un mensaje amigable, indicando los campos que faltan.
+2. Si el servicio no es válido, responde con un mensaje amigable, indicando que no está en la lista.
 3. Si todo es válido, responde con un JSON puro (sin etiquetas, sin formato Markdown, sin comillas triples ni código bloque). El formato exacto debe ser:
 
 REGLAS IMPORTANTES:

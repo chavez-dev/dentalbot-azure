@@ -3,7 +3,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel
 from dental_chain.llm import llm
-from dental_chain.utils.constants import SERVICIOS_LISTA, SYSTEM
+from dental_chain.utils.constants import SYSTEM
 
 
 class QA(BaseModel):
@@ -15,7 +15,6 @@ parser = JsonOutputParser(pydantic_object=QA)
 
 prompt = ChatPromptTemplate.from_template(
     """
-Eres un bot de una Clinica Dental, ten en consideracion lo siguiente:
 {system}
 Tu tarea es responder la siguiente pregunta de manera breve (máx. 3 frases) y **devolver la salida en JSON válido** con los siguientes campos:
 - pregunta: la pregunta original
@@ -29,7 +28,7 @@ Pregunta:
 )
 
 respuesta_chain = (
-    prompt.partial(system=SERVICIOS_LISTA,format_instructions=parser.get_format_instructions())
+    prompt.partial(system=SYSTEM,format_instructions=parser.get_format_instructions())
     | llm
     | parser
 )
