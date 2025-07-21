@@ -24,6 +24,7 @@
     bottom: 80px;
     right: 20px;
     width: 320px;
+    height: 450px; 
     max-height: 500px;
     background: white;
     border-radius: 12px;
@@ -35,7 +36,7 @@
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* Cabecera del chat */
@@ -122,6 +123,33 @@
     padding: 0.4rem;
     text-align: center;
 }
+
+#bot-icon {
+    animation: saltar 1s infinite;
+}
+
+.msg.bot.loading span {
+    color: #555;
+    font-style: italic;
+}
+
+.msg.bot.loading i {
+    margin-right: 8px;
+}
+
+
+
+
+/* Definimos la animación */
+@keyframes saltar {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
 
 /* RESPONSIVE */
 @media screen and (max-width: 600px) {

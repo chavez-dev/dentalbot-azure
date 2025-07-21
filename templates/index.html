@@ -12,6 +12,9 @@
     <!-- Estilos del chatbot -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}" />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
@@ -99,7 +102,10 @@
     </main>
 
     <!-- Ícono del bot -->
-    <div id="bot-icon">💬</div>
+    <div id="bot-icon">
+        <i class="fas fa-robot"></i>
+    </div>
+
 
     <!-- Ventana de chat -->
     <div id="chat-window" class="hidden">
@@ -112,6 +118,8 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+
+
 </body>
 
 </html>
