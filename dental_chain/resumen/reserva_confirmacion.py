@@ -79,28 +79,6 @@ def formatear_fecha(fecha_str: str) -> str:
 
     return fecha_str
 
-
-# def decision_logic(output):
-#     datos = output["datos"]
-#     valido_datos = output["valido_datos"]
-#     valido_servicio = output["valido_servicio"]
-
-#     if valido_datos["valido"] and valido_servicio:
-#         fecha_normalizada = formatear_fecha_chain.invoke(
-#             datos["fecha_programada"])
-#         datos["fecha_programada"] = fecha_normalizada
-#         return datos
-
-#     if not valido_datos["valido"]:
-#         faltantes = valido_datos["faltantes"]
-#         mensaje = "⚠️ No puedo realizar una reserva porque faltan los siguientes datos: " + \
-#             ", ".join(faltantes)
-#         return mensaje
-
-#     servicio = datos.get("servicio", "").strip()
-#     return f"🚫 El servicio '{servicio}' no está disponible en DentalCare Tacna. Revisa la lista de servicios ofrecidos."
-
-
 def validar_servicio(reserva: dict) -> bool:
     servicio = reserva.get("servicio", "").strip().lower()
     return servicio in [s.lower() for s in SERVICIOS_LISTA]
